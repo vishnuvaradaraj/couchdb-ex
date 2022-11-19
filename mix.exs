@@ -28,7 +28,7 @@ defmodule CouchDBEx.MixProject do
   defp deps do
     [
       {:httpoison, "~> 1.8.2"},
-      {:poison, "~> 5.0.0"},
+      {:poison, "~> 3.1.0"},
 
       {:dialyxir, "~> 1.2.0", only: :dev, runtime: false},
       {:ex_doc, "~> 0.29.0 ", only: :dev, runtime: false},
