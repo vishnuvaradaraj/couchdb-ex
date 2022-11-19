@@ -27,14 +27,14 @@ defmodule CouchDBEx.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:httpoison, "~> 1.0"},
-      {:poison, "~> 3.1"},
+      {:httpoison, "~> 1.8.2"},
+      {:poison, "~> 5.0.0"},
 
-      {:dialyxir, "~> 0.5", only: :dev, runtime: false},
-      {:ex_doc, "~> 0.16", only: :dev, runtime: false},
-      {:credo, "~> 0.3", only: :dev},
+      {:dialyxir, "~> 1.2.0", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.29.0 ", only: :dev, runtime: false},
+      {:credo, "~> 1.6.7", only: :dev},
 
-      {:excoveralls, "~> 0.8", only: :test, runtime: false}
+      {:excoveralls, "~> 0.15.0", only: :test, runtime: false}
     ]
   end
 
