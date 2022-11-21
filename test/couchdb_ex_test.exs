@@ -19,6 +19,7 @@ defmodule CouchDBExTest do
   end
 
   setup do
+    CouchDBEx.db_delete("couchdb-ex-test")
     :ok = CouchDBEx.db_create("couchdb-ex-test")
 
     on_exit fn ->
@@ -258,4 +259,38 @@ defmodule CouchDBExTest do
 
   end
 
+  test "inserting a document and retrieving revs" do
+    {:ok, %{"id" => docid, "rev" => docrev}} = CouchDBEx.document_insert_one(%{test_value: 1}, "couchdb-ex-test")
+
+    revs = %{"docs" => [
+      %{"id" => docid}
+    ]}
+    {:ok, result} =
+      CouchDBEx.document_revs(revs, "couchdb-ex-test")
+
+    IO.puts "document_revs: #{inspect(result)}"
+  end
+
+  test "inserting a document and retrieving rev diffs" do
+    {:ok, %{"id" => docid, "rev" => docrev}} = CouchDBEx.document_insert_one(%{test_value: 1}, "couchdb-ex-test")
+
+    revs = %{docid => [
+     "1-1145d175b80d94f4ad78198a897cf935"
+    ]}
+    {:ok, result} =
+      CouchDBEx.document_rev_diffs(revs, "couchdb-ex-test")
+
+    IO.puts "document_rev_diffs: #{inspect(result)}"
+  end
+
+  test "bulk inserting documents" do
+
+    {:ok, %{"id" => docid, "rev" => docrev}} = CouchDBEx.document_insert_one(%{test_value: 1}, "couchdb-ex-test")
+
+    docs = %{ "docs" => [%{"_id" => docid}]}
+    {_, result} =
+      CouchDBEx.document_bulk_update(docs, "couchdb-ex-test")
+
+    IO.puts "document_rev_diffs: #{inspect(result)}"
+  end
 end

@@ -198,6 +198,65 @@ defmodule CouchDBEx.Worker do
   end
 
   @impl true
+  def handle_call({:document_bulk_update, docs, database, _opts}, _from, state) do
+
+    body = (docs |> Poison.encode!)
+    IO.puts "Bulk update params: '#{body}'"
+
+    with {:ok, resp} <- HTTPClient.post(
+           "#{state[:hostname]}:#{state[:port]}/#{database}/_bulk_docs",
+           body,
+           [{"Content-Type", "application/json"}]
+         ),
+         json_resp <- resp.body |> Poison.decode! do
+          {:reply, {:ok, json_resp}, state}
+    else e -> {:reply, e, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:document_revs, revs, database, opts}, _from, state) do
+
+    body = (revs |> Poison.encode!)
+
+    with {:ok, resp} <- HTTPClient.post(
+           "#{state[:hostname]}:#{state[:port]}/#{database}/_bulk_get",
+           body,
+           [{"Content-Type", "application/json"}],
+           params: opts |> Enum.into(%{})
+         ),
+         json_resp <- resp.body |> Poison.decode! do
+      if not Map.has_key?(json_resp, "error") do
+        {:reply, {:ok, json_resp}, state}
+      else
+        {:reply, transform_error(json_resp), state}
+      end
+    else e -> {:reply, e, state}
+    end
+  end
+
+  @impl true
+  def handle_call({:document_rev_diffs, revs, database, opts}, _from, state) do
+
+    body =  (revs |> Poison.encode!)
+
+    with {:ok, resp} <- HTTPClient.post(
+           "#{state[:hostname]}:#{state[:port]}/#{database}/_revs_diff",
+           body,
+           [{"Content-Type", "application/json"}],
+           params: opts |> Enum.into(%{})
+         ),
+         json_resp <- resp.body |> Poison.decode! do
+      if not Map.has_key?(json_resp, "error") do
+        {:reply, {:ok, json_resp}, state}
+      else
+        {:reply, transform_error(json_resp), state}
+      end
+    else e -> {:reply, e, state}
+    end
+  end
+
+  @impl true
   def handle_call({:document_get, id, database, opts}, _from, state) do
     with {:ok, resp} <- HTTPClient.get(
            "#{state[:hostname]}:#{state[:port]}/#{database}/#{id}",

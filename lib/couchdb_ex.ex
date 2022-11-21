@@ -153,6 +153,33 @@ defmodule CouchDBEx do
   def document_list(db, opts \\ []), do: GenServer.call(CouchDBEx.Worker, {:document_list, db, opts}, :infinity)
 
   @doc """
+  Bulk fetch revs (or filtered) documents in the database, along with their number
+
+  Options are those from
+  [`_bulk_docs`](http://docs.couchdb.org/en/2.1.1/api/database/bulk-api.html#get--db-_all_docs)
+  """
+  @spec document_revs(revs :: map, db :: String.t, opts :: keyword) :: couchdb_res
+  def document_revs(revs, db, opts \\ [revs: true, latest: true]), do: GenServer.call(CouchDBEx.Worker, {:document_revs, revs, db, opts}, :infinity)
+
+  @doc """
+  Rev diffs of documents in the database
+
+  Options are those from
+  [`_revs_diff`](http://docs.couchdb.org/en/2.1.1/api/database/bulk-api.html#get--db-_all_docs)
+  """
+  @spec document_rev_diffs(revs :: map, db :: String.t, opts :: keyword) :: couchdb_res
+  def document_rev_diffs(revs, db, opts \\ []), do: GenServer.call(CouchDBEx.Worker, {:document_rev_diffs, revs, db, opts}, :infinity)
+
+  @doc """
+  Bulk update documents in the database, along with their number
+
+  Options are those from
+  [`_bulk_docs`](http://docs.couchdb.org/en/2.1.1/api/database/bulk-api.html#get--db-_all_docs)
+  """
+  @spec document_bulk_update(docs :: [map], db :: String.t, opts :: keyword) :: couchdb_res
+  def document_bulk_update(docs, db, opts \\ []), do: GenServer.call(CouchDBEx.Worker, {:document_bulk_update, docs, db, opts}, :infinity)
+
+  @doc """
   Get a document from the database.
 
   ## Options
