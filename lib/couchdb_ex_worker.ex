@@ -236,6 +236,27 @@ defmodule CouchDBEx.Worker do
   end
 
   @impl true
+  def handle_call({:document_changes, database, opts}, _from, state) do
+
+    body = (%{} |> Poison.encode!)
+
+    with {:ok, resp} <- HTTPClient.post(
+           "#{state[:hostname]}:#{state[:port]}/#{database}/_changes",
+           body,
+           [{"Content-Type", "application/json"}],
+           params: opts |> Enum.into(%{})
+         ),
+         json_resp <- resp.body |> Poison.decode! do
+      if not Map.has_key?(json_resp, "error") do
+        {:reply, {:ok, json_resp}, state}
+      else
+        {:reply, transform_error(json_resp), state}
+      end
+    else e -> {:reply, e, state}
+    end
+  end
+
+  @impl true
   def handle_call({:document_rev_diffs, revs, database, opts}, _from, state) do
 
     body =  (revs |> Poison.encode!)

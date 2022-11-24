@@ -153,6 +153,15 @@ defmodule CouchDBEx do
   def document_list(db, opts \\ []), do: GenServer.call(CouchDBEx.Worker, {:document_list, db, opts}, :infinity)
 
   @doc """
+  Bulk fetch changes in the database, along with their number
+
+  Options are those from
+  [`_changes`](http://docs.couchdb.org/en/2.1.1/api/database/bulk-api.html#get--db-_all_docs)
+  """
+  @spec document_changes(db :: String.t, opts :: keyword) :: couchdb_res
+  def document_changes(db, opts \\ [style: "all_docs", feed: "normal"]), do: GenServer.call(CouchDBEx.Worker, {:document_changes, db, opts}, :infinity)
+
+  @doc """
   Bulk fetch revs (or filtered) documents in the database, along with their number
 
   Options are those from
